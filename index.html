@@ -3,8 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Question AI - Smart Study Helper</title>
+    <title>Solvey AI - Smart Study Helper</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #e0e7ff;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --error: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,9 +37,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-            color: #2d3748;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
             line-height: 1.6;
         }
 
@@ -22,30 +47,37 @@
             max-width: 420px;
             margin: 0 auto;
             min-height: 100vh;
-            background: white;
+            background: var(--card-bg);
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            overflow-x: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 24px 20px 20px;
             text-align: center;
             color: white;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
 
         .header h1 {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .header p {
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             opacity: 0.9;
+            font-weight: 400;
         }
 
         .main-content {
@@ -55,10 +87,11 @@
 
         .input-mode-toggle {
             display: flex;
-            background: #f1f5f9;
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 20px;
+            background: var(--primary-light);
+            border-radius: var(--border-radius);
+            padding: 6px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
         }
 
         .mode-btn {
@@ -70,27 +103,36 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: #64748b;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.875rem;
         }
 
         .mode-btn.active {
-            background: white;
-            color: #667eea;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mode-btn .material-icons-round {
+            font-size: 18px;
         }
 
         .subject-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .subject-btn {
             aspect-ratio: 1;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
             font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
@@ -99,26 +141,27 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            color: #64748b;
+            gap: 6px;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
         }
 
         .subject-btn:hover {
-            border-color: #667eea;
+            border-color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            box-shadow: var(--shadow);
         }
 
         .subject-btn.active {
-            border-color: #667eea;
-            background: #667eea;
+            border-color: var(--primary);
+            background: var(--primary);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: var(--shadow);
         }
 
         .subject-icon {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
         }
 
         .input-section {
@@ -135,87 +178,101 @@
 
         .question-input {
             width: 100%;
-            min-height: 120px;
+            min-height: 140px;
             padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-size: 0.9375rem;
             resize: vertical;
             transition: all 0.3s ease;
             font-family: inherit;
-            background: #fafbfc;
+            background: var(--card-bg);
             margin-bottom: 50px;
+            box-shadow: var(--shadow-sm);
         }
 
         .question-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            background: var(--card-bg);
         }
 
         .image-upload-area {
             border: 2px dashed #cbd5e0;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             padding: 30px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #fafbfc;
+            background: var(--card-bg);
             position: relative;
             margin-bottom: 84px;
+            box-shadow: var(--shadow-sm);
         }
 
         .image-upload-area:hover {
-            border-color: #667eea;
+            border-color: var(--primary);
             background: #f8faff;
         }
 
         .image-upload-area.dragover {
-            border-color: #667eea;
+            border-color: var(--primary);
             background: #f0f4ff;
             transform: scale(1.02);
         }
 
         .upload-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: #94a3b8;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .upload-text {
-            color: #64748b;
+            color: var(--text-secondary);
             font-weight: 500;
+            font-size: 0.9375rem;
         }
 
         .upload-subtext {
             color: #94a3b8;
-            font-size: 0.85rem;
-            margin-top: 5px;
+            font-size: 0.8125rem;
+            margin-top: 6px;
         }
 
         .image-preview {
             max-width: 100%;
             max-height: 200px;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             margin-top: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .image-question-input {
             margin-top: 15px;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.9rem;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-size: 0.9375rem;
             width: 100%;
             font-family: inherit;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .image-question-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
 
         .image-actions {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 12px;
+            justify-content: center;
         }
 
         .remove-image-btn {
@@ -224,9 +281,13 @@
             color: #dc2626;
             border: none;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8125rem;
             font-weight: 500;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
         }
 
         .hidden-file-input {
@@ -241,30 +302,32 @@
             width: calc(100% - 40px);
             max-width: 380px;
             padding: 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            z-index: 10;
         }
 
         .submit-btn:hover {
             transform: translateX(-50%) translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: var(--shadow-lg);
         }
 
         .submit-btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: translateX(-50%);
+            background: var(--text-secondary);
         }
 
         .loading-spinner {
@@ -282,23 +345,23 @@
         }
 
         .result-section {
-            background: #f8fafc;
-            border-radius: 12px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
             padding: 20px;
             margin-top: 20px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid var(--primary);
             display: none;
-
             margin-bottom: 84px;
+            box-shadow: var(--shadow-sm);
         }
 
         .result-section.show {
             display: block;
-            animation: slideUp 0.5s ease;
+            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -307,66 +370,105 @@
             align-items: center;
             margin-bottom: 15px;
             font-weight: 600;
-            color: #374151;
+            color: var(--text-primary);
         }
 
         .result-icon {
-            width: 24px;
-            height: 24px;
-            background: #667eea;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 10px;
-            font-size: 0.8rem;
+            margin-right: 12px;
             color: white;
         }
 
         .result-content {
-            color: #4b5563;
+            color: var(--text-primary);
             line-height: 1.7;
             white-space: pre-wrap;
-            font-size: 0.95rem;
+            font-size: 0.9375rem;
         }
 
         .error-message {
             background: #fef2f2;
             border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 12px;
+            color: var(--error);
+            padding: 12px 16px;
             border-radius: 8px;
             margin-top: 10px;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .api-status {
-            display:none;
             position: fixed;
             top: 80px;
             right: 20px;
-            padding: 8px 12px;
-            background: #10b981;
+            padding: 8px 12px 8px 10px;
+            background: var(--success);
             color: white;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
             z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow);
+            animation: slideInRight 0.3s ease;
         }
 
         .mode-indicator {
-            display:none;
             position: fixed;
             top: 120px;
             right: 20px;
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.9);
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.95);
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 500;
-            color: #64748b;
+            color: var(--text-secondary);
             z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow);
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         @media (max-width: 480px) {
@@ -380,81 +482,130 @@
             }
 
             .main-content {
-                padding: 15px;
+                padding: 16px;
+            }
+            
+            .header {
+                padding: 20px 16px 16px;
+            }
+            
+            .submit-btn {
+                width: calc(100% - 32px);
             }
         }
 
-        /* Smooth transitions */
-        .fade-transition {
-            transition: opacity 0.3s ease, transform 0.3s ease;
+        /* Markdown-like formatting for answers */
+        .result-content h3, .result-content h4 {
+            margin: 16px 0 8px;
+            color: var(--text-primary);
         }
-
-        .fade-out {
-            opacity: 0;
-            transform: translateY(-10px);
+        
+        .result-content p {
+            margin-bottom: 12px;
         }
-
-        .fade-in {
-            opacity: 1;
-            transform: translateY(0);
+        
+        .result-content ul, .result-content ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        
+        .result-content li {
+            margin-bottom: 6px;
+        }
+        
+        .result-content pre {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 12px 0;
+            font-size: 0.875rem;
+        }
+        
+        .result-content code {
+            font-family: 'Courier New', monospace;
+            background: #f1f5f9;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .result-content blockquote {
+            border-left: 3px solid var(--primary);
+            padding-left: 12px;
+            margin: 12px 0;
+            color: var(--text-secondary);
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header">
-            <h1>Solvey AI</h1>
+            <h1>
+                <span class="material-icons-round">auto_awesome</span>
+                Solvey AI
+            </h1>
             <p>Smart answers for all subjects</p>
         </div>
 
-        <div class="api-status">✅ API Ready</div>
-        <div class="mode-indicator" id="modeIndicator">📝 Text Mode</div>
+        <div class="api-status">
+            <span class="material-icons-round" style="font-size: 16px;">check_circle</span>
+            <span>API Ready</span>
+        </div>
+        <div class="mode-indicator" id="modeIndicator">
+            <span class="material-icons-round" style="font-size: 16px;">edit</span>
+            <span>Text Mode</span>
+        </div>
 
         <div class="main-content">
             <div class="input-mode-toggle">
-                <button class="mode-btn active" data-mode="text">📝 Text</button>
-                <button class="mode-btn" data-mode="image">📷 Image</button>
+                <button class="mode-btn active" data-mode="text">
+                    <span class="material-icons-round">edit</span>
+                    Text
+                </button>
+                <button class="mode-btn" data-mode="image">
+                    <span class="material-icons-round">image</span>
+                    Image
+                </button>
             </div>
 
             <div class="subject-grid">
                 <button class="subject-btn active" data-subject="general">
-                    <span class="subject-icon">🎯</span>
+                    <span class="material-icons-round">public</span>
                     <span>General</span>
                 </button>
                 <button class="subject-btn" data-subject="math">
-                    <span class="subject-icon">🔢</span>
+                    <span class="material-icons-round">calculate</span>
                     <span>Math</span>
                 </button>
                 <button class="subject-btn" data-subject="physics">
-                    <span class="subject-icon">⚡</span>
+                    <span class="material-icons-round">bolt</span>
                     <span>Physics</span>
                 </button>
                 <button class="subject-btn" data-subject="chemistry">
-                    <span class="subject-icon">🧪</span>
+                    <span class="material-icons-round">science</span>
                     <span>Chemistry</span>
                 </button>
                 <button class="subject-btn" data-subject="biology">
-                    <span class="subject-icon">🧬</span>
+                    <span class="material-icons-round">biotech</span>
                     <span>Biology</span>
                 </button>
                 <button class="subject-btn" data-subject="hindi">
-                    <span class="subject-icon">🇮🇳</span>
+                    <span class="material-icons-round">language</span>
                     <span>Hindi</span>
                 </button>
                 <button class="subject-btn" data-subject="english">
-                    <span class="subject-icon">🇬🇧</span>
+                    <span class="material-icons-round">menu_book</span>
                     <span>English</span>
                 </button>
                 <button class="subject-btn" data-subject="history">
-                    <span class="subject-icon">📜</span>
+                    <span class="material-icons-round">history</span>
                     <span>History</span>
                 </button>
-<button class="subject-btn" data-subject="commerce">
-    <span class="subject-icon">💼</span>
-    <span>Commerce</span>
-</button>
-
-              
+                <button class="subject-btn" data-subject="commerce">
+                    <span class="material-icons-round">business</span>
+                    <span>Commerce</span>
+                </button>
             </div>
 
             <div class="input-section">
@@ -474,7 +625,7 @@ Examples:
 
                 <div class="image-input-section" id="imageInputSection">
                     <div class="image-upload-area" id="imageUploadArea">
-                        <div class="upload-icon">📷</div>
+                        <div class="upload-icon material-icons-round">image</div>
                         <div class="upload-text">Tap to upload image</div>
                         <div class="upload-subtext">or drag and drop here</div>
                         <input type="file" class="hidden-file-input" id="imageInput" accept="image/*">
@@ -485,7 +636,9 @@ Examples:
 
             <div id="resultSection" class="result-section">
                 <div class="result-header">
-                    <div class="result-icon">🤖</div>
+                    <div class="result-icon">
+                        <span class="material-icons-round" style="font-size: 18px;">auto_awesome</span>
+                    </div>
                     <div>AI Answer</div>
                 </div>
                 <div id="resultContent" class="result-content"></div>
@@ -494,7 +647,7 @@ Examples:
 
         <button id="submitBtn" class="submit-btn">
             <span id="submitText">Get Answer</span>
-            <span id="submitIcon">🚀</span>
+            <span id="submitIcon" class="material-icons-round">send</span>
         </button>
     </div>
 
@@ -511,6 +664,7 @@ Examples:
             init() {
                 this.bindEvents();
                 this.updateModeIndicator();
+                this.showToast('Welcome to Solvey AI!', 'info');
             }
 
             bindEvents() {
@@ -521,6 +675,7 @@ Examples:
                         e.target.classList.add('active');
                         this.currentMode = e.target.dataset.mode;
                         this.switchMode();
+                        this.showToast(`Switched to ${this.currentMode === 'text' ? 'Text' : 'Image'} mode`, 'info');
                     });
                 });
 
@@ -530,6 +685,7 @@ Examples:
                         document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
                         e.target.classList.add('active');
                         this.selectedSubject = e.target.dataset.subject;
+                        this.showToast(`Selected subject: ${e.target.querySelector('span:last-child').textContent}`, 'info');
                     });
                 });
 
@@ -590,12 +746,25 @@ Examples:
 
             updateModeIndicator() {
                 const indicator = document.getElementById('modeIndicator');
-                indicator.textContent = this.currentMode === 'text' ? '📝 Text Mode' : '📷 Image Mode';
+                const icon = indicator.querySelector('.material-icons-round');
+                const text = indicator.querySelector('span:last-child');
+                
+                if (this.currentMode === 'text') {
+                    icon.textContent = 'edit';
+                    text.textContent = 'Text Mode';
+                } else {
+                    icon.textContent = 'image';
+                    text.textContent = 'Image Mode';
+                }
             }
 
             handleImageUpload(e) {
                 const file = e.target.files[0];
                 if (file && file.type.startsWith('image/')) {
+                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        this.showToast('Image size should be less than 5MB', 'error');
+                        return;
+                    }
                     this.processImage(file);
                 }
             }
@@ -605,9 +774,14 @@ Examples:
                 reader.onload = (e) => {
                     this.uploadedImage = {
                         data: e.target.result,
-                        mimeType: file.type
+                        mimeType: file.type,
+                        name: file.name
                     };
                     this.showImagePreview(e.target.result);
+                    this.showToast('Image uploaded successfully', 'success');
+                };
+                reader.onerror = () => {
+                    this.showToast('Error reading image file', 'error');
                 };
                 reader.readAsDataURL(file);
             }
@@ -620,7 +794,8 @@ Examples:
                            placeholder="Ask about this image... (e.g., 'Solve this problem', 'What is this?', 'Explain this diagram')">
                     <div class="image-actions">
                         <button class="remove-image-btn" onclick="questionAI.removeImage()">
-                            🗑️ Remove Image
+                            <span class="material-icons-round" style="font-size: 16px;">delete</span>
+                            Remove Image
                         </button>
                     </div>
                 `;
@@ -629,6 +804,8 @@ Examples:
             removeImage() {
                 this.uploadedImage = null;
                 document.getElementById('imagePreviewContainer').innerHTML = '';
+                document.getElementById('imageInput').value = '';
+                this.showToast('Image removed', 'info');
             }
 
             async handleSubmit() {
@@ -638,11 +815,13 @@ Examples:
                     question = document.getElementById('questionInput').value.trim();
                     if (!question) {
                         this.showError('Please enter your question!');
+                        this.showToast('Please enter your question', 'error');
                         return;
                     }
                 } else {
                     if (!this.uploadedImage) {
                         this.showError('Please upload an image first!');
+                        this.showToast('Please upload an image first', 'error');
                         return;
                     }
                     question = document.getElementById('imageQuestionInput')?.value.trim() || 'Analyze this image and answer any questions about it';
@@ -650,13 +829,19 @@ Examples:
 
                 this.setLoading(true);
                 this.hideResult();
+                this.showToast('Processing your question...', 'info');
 
                 try {
                     const answer = await this.getAIAnswer(question);
                     this.showResult(answer);
+                    this.showToast('Answer generated successfully!', 'success');
                 } catch (error) {
                     console.error('Error:', error);
-                    this.showError('Sorry, there was an error processing your request. Please try again.');
+                    const errorMsg = error.message.includes('quota') 
+                        ? 'API quota exceeded. Please try again later.' 
+                        : 'Sorry, there was an error processing your request. Please try again.';
+                    this.showError(errorMsg);
+                    this.showToast(errorMsg, 'error');
                 } finally {
                     this.setLoading(false);
                 }
@@ -667,16 +852,17 @@ Examples:
                     general: "Please provide a comprehensive and helpful answer to this question:",
                     hindi: "Please answer this question in Hindi if it's about Hindi language, literature, or culture:",
                     english: "Please provide a comprehensive answer focusing on English language, grammar, or literature:",
-                    math: "Please solve this mathematical problem step by step, showing all work:",
-                    physics: "Please explain this physics concept or solve this problem with detailed explanations:",
-                    chemistry: "Please explain this chemistry concept or solve this problem with detailed explanations:",
-                    biology: "Please explain this biological concept with detailed scientific explanations:",
-                    history: "Please provide a comprehensive historical explanation:"
+                    math: "Please solve this mathematical problem step by step, showing all work and explanations:",
+                    physics: "Please explain this physics concept or solve this problem with detailed explanations and formulas:",
+                    chemistry: "Please explain this chemistry concept or solve this problem with detailed explanations and chemical equations:",
+                    biology: "Please explain this biological concept with detailed scientific explanations and diagrams if helpful:",
+                    history: "Please provide a comprehensive historical explanation with relevant dates and context:",
+                    commerce: "Please provide a detailed answer about commerce, business, or economics with relevant examples:"
                 };
 
                 const prompt = `${subjectPrompts[this.selectedSubject]} "${question}"
 
-Please format your response clearly with step-by-step explanations where applicable.`;
+Please format your response clearly with step-by-step explanations where applicable. Use markdown formatting for better readability.`;
 
                 const requestBody = {
                     contents: [{
@@ -757,7 +943,8 @@ Please format your response clearly with step-by-step explanations where applica
                 } else {
                     btn.disabled = false;
                     text.textContent = 'Get Answer';
-                    icon.textContent = '🚀';
+                    icon.innerHTML = 'send';
+                    icon.classList.add('material-icons-round');
                 }
             }
 
@@ -765,7 +952,17 @@ Please format your response clearly with step-by-step explanations where applica
                 const resultSection = document.getElementById('resultSection');
                 const resultContent = document.getElementById('resultContent');
                 
-                resultContent.textContent = content;
+                // Simple markdown formatting
+                let formattedContent = content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>') // italic
+                    .replace(/^# (.*$)/gm, '<h3>$1</h3>') // h1
+                    .replace(/^## (.*$)/gm, '<h4>$1</h4>') // h2
+                    .replace(/^### (.*$)/gm, '<h5>$1</h5>') // h3
+                    .replace(/`(.*?)`/g, '<code>$1</code>') // inline code
+                    .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>'); // code blocks
+                
+                resultContent.innerHTML = formattedContent;
                 resultSection.classList.add('show');
                 
                 // Scroll to result
@@ -782,8 +979,59 @@ Please format your response clearly with step-by-step explanations where applica
                 const resultSection = document.getElementById('resultSection');
                 const resultContent = document.getElementById('resultContent');
                 
-                resultContent.innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
+                resultContent.innerHTML = `
+                    <div class="error-message">
+                        <span class="material-icons-round" style="font-size: 18px;">error</span>
+                        <span>${message}</span>
+                    </div>
+                `;
                 resultSection.classList.add('show');
+            }
+            
+            showToast(message, type = 'info') {
+                // Remove existing toast if any
+                const existingToast = document.querySelector('.toast');
+                if (existingToast) {
+                    existingToast.remove();
+                }
+                
+                const toast = document.createElement('div');
+                toast.className = `toast animate__animated animate__fadeInUp`;
+                
+                let icon = 'info';
+                let bgColor = 'var(--primary)';
+                
+                switch(type) {
+                    case 'success':
+                        icon = 'check_circle';
+                        bgColor = 'var(--success)';
+                        break;
+                    case 'error':
+                        icon = 'error';
+                        bgColor = 'var(--error)';
+                        break;
+                    case 'warning':
+                        icon = 'warning';
+                        bgColor = 'var(--warning)';
+                        break;
+                    default:
+                        icon = 'info';
+                        bgColor = 'var(--primary)';
+                }
+                
+                toast.innerHTML = `
+                    <span class="material-icons-round" style="font-size: 18px;">${icon}</span>
+                    <span>${message}</span>
+                `;
+                toast.style.background = bgColor;
+                
+                document.body.appendChild(toast);
+                
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    toast.classList.add('animate__fadeOut');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
             }
         }
 
