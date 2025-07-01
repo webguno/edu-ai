@@ -825,408 +825,434 @@ Examples:
     </div>
 
     <script>
-        class QuestionAI {
-            constructor() {
-                this.selectedSubject = 'general';
-                this.currentMode = 'text';
-                this.apiKey = 'AIzaSyAeqvXWNYSewovcwusjmMoqc0LbpIDP5j0';
-                this.uploadedImage = null;
-                this.init();
-            }
+       class QuestionAI {
+    constructor() {
+        this.selectedSubject = 'general';
+        this.currentMode = 'text';
+        this.apiKey = 'AIzaSyAeqvXWNYSewovcwusjmMoqc0LbpIDP5j0';
+        this.uploadedImage = null;
+    }
 
-            init() {
-                this.bindEvents();
-                this.updateModeIndicator();
-                this.showToast('Welcome to Solvey AI!', 'info');
-            }
+    init() {
+        this.bindEvents();
+        
+        // Only update mode indicator if the element exists
+        if (document.getElementById('modeIndicator')) {
+            this.updateModeIndicator();
+        }
+        
+        this.showToast('Welcome to Solvey AI!', 'info');
+    }
 
-            bindEvents() {
-                // Mode toggle
-                document.querySelectorAll('.mode-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                        e.target.classList.add('active');
-                        this.currentMode = e.target.dataset.mode;
-                        this.switchMode();
-                        this.showToast(`Switched to ${this.currentMode === 'text' ? 'Text' : 'Image'} mode`, 'info');
-                    });
-                });
+    bindEvents() {
+        // Mode toggle
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.currentMode = e.target.dataset.mode;
+                this.switchMode();
+                this.showToast(`Switched to ${this.currentMode === 'text' ? 'Text' : 'Image'} mode`, 'info');
+            });
+        });
 
-                // Subject selection
-                document.querySelectorAll('.subject-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
-                        e.target.classList.add('active');
-                        this.selectedSubject = e.target.dataset.subject;
-                        this.showToast(`Selected subject: ${e.target.querySelector('span:last-child').textContent}`, 'info');
-                    });
-                });
+        // Subject selection
+        document.querySelectorAll('.subject-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.selectedSubject = e.target.dataset.subject;
+                this.showToast(`Selected subject: ${e.target.querySelector('span:last-child').textContent}`, 'info');
+            });
+        });
 
-                // Image upload
-                const imageUploadArea = document.getElementById('imageUploadArea');
-                const imageInput = document.getElementById('imageInput');
+        // Image upload
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const imageInput = document.getElementById('imageInput');
 
-                imageUploadArea.addEventListener('click', () => imageInput.click());
-                imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
+        if (imageUploadArea && imageInput) {
+            imageUploadArea.addEventListener('click', () => imageInput.click());
+            imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
 
-                // Drag and drop
-                imageUploadArea.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    imageUploadArea.classList.add('dragover');
-                });
+            // Drag and drop
+            imageUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.add('dragover');
+            });
 
-                imageUploadArea.addEventListener('dragleave', () => {
-                    imageUploadArea.classList.remove('dragover');
-                });
+            imageUploadArea.addEventListener('dragleave', () => {
+                imageUploadArea.classList.remove('dragover');
+            });
 
-                imageUploadArea.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    imageUploadArea.classList.remove('dragover');
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0 && files[0].type.startsWith('image/')) {
-                        this.processImage(files[0]);
-                    }
-                });
+            imageUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type.startsWith('image/')) {
+                    this.processImage(files[0]);
+                }
+            });
+        }
 
-                // Submit button
-                document.getElementById('submitBtn').addEventListener('click', () => {
+        // Submit button
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                this.handleSubmit();
+            });
+        }
+
+        // Enter key in textarea
+        const questionInput = document.getElementById('questionInput');
+        if (questionInput) {
+            questionInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
                     this.handleSubmit();
-                });
-
-                // Enter key in textarea
-                document.getElementById('questionInput').addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && e.ctrlKey) {
-                        this.handleSubmit();
-                    }
-                });
-            }
-
-            switchMode() {
-                const textSection = document.getElementById('textInputSection');
-                const imageSection = document.getElementById('imageInputSection');
-
-                if (this.currentMode === 'text') {
-                    textSection.style.display = 'block';
-                    imageSection.style.display = 'none';
-                } else {
-                    textSection.style.display = 'none';
-                    imageSection.style.display = 'block';
                 }
+            });
+        }
+    }
 
-                this.updateModeIndicator();
-                this.hideResult();
-            }
+    switchMode() {
+        const textSection = document.getElementById('textInputSection');
+        const imageSection = document.getElementById('imageInputSection');
 
-            updateModeIndicator() {
-                const indicator = document.getElementById('modeIndicator');
-                const icon = indicator.querySelector('.material-icons-round');
-                const text = indicator.querySelector('span:last-child');
-                
-                if (this.currentMode === 'text') {
-                    icon.textContent = 'edit';
-                    text.textContent = 'Text Mode';
-                } else {
-                    icon.textContent = 'image';
-                    text.textContent = 'Image Mode';
-                }
-            }
-
-            handleImageUpload(e) {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                        this.showToast('Image size should be less than 5MB', 'error');
-                        return;
-                    }
-                    this.processImage(file);
-                }
-            }
-
-            processImage(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.uploadedImage = {
-                        data: e.target.result,
-                        mimeType: file.type,
-                        name: file.name
-                    };
-                    this.showImagePreview(e.target.result);
-                    this.showToast('Image uploaded successfully', 'success');
-                };
-                reader.onerror = () => {
-                    this.showToast('Error reading image file', 'error');
-                };
-                reader.readAsDataURL(file);
-            }
-
-            showImagePreview(imageSrc) {
-                const container = document.getElementById('imagePreviewContainer');
-                container.innerHTML = `
-                    <img src="${imageSrc}" class="image-preview" alt="Uploaded image">
-                    <input type="text" class="image-question-input" id="imageQuestionInput" 
-                           placeholder="Ask about this image... (e.g., 'Solve this problem', 'What is this?', 'Explain this diagram')">
-                    <div class="image-actions">
-                        <button class="remove-image-btn" onclick="questionAI.removeImage()">
-                            <span class="material-icons-round" style="font-size: 16px;">delete</span>
-                            Remove Image
-                        </button>
-                    </div>
-                `;
-            }
-
-            removeImage() {
-                this.uploadedImage = null;
-                document.getElementById('imagePreviewContainer').innerHTML = '';
-                document.getElementById('imageInput').value = '';
-                this.showToast('Image removed', 'info');
-            }
-
-            async handleSubmit() {
-                let question = '';
-                
-                if (this.currentMode === 'text') {
-                    question = document.getElementById('questionInput').value.trim();
-                    if (!question) {
-                        this.showError('Please enter your question!');
-                        this.showToast('Please enter your question', 'error');
-                        return;
-                    }
-                } else {
-                    if (!this.uploadedImage) {
-                        this.showError('Please upload an image first!');
-                        this.showToast('Please upload an image first', 'error');
-                        return;
-                    }
-                    question = document.getElementById('imageQuestionInput')?.value.trim() || 'Analyze this image and answer any questions about it';
-                }
-
-                this.setLoading(true);
-                this.hideResult();
-                this.showToast('Processing your question...', 'info');
-
-                try {
-                    const answer = await this.getAIAnswer(question);
-                    this.showResult(answer);
-                    this.showToast('Answer generated successfully!', 'success');
-                } catch (error) {
-                    console.error('Error:', error);
-                    const errorMsg = error.message.includes('quota') 
-                        ? 'API quota exceeded. Please try again later.' 
-                        : 'Sorry, there was an error processing your request. Please try again.';
-                    this.showError(errorMsg);
-                    this.showToast(errorMsg, 'error');
-                } finally {
-                    this.setLoading(false);
-                }
-            }
-
-            async getAIAnswer(question) {
-                const subjectPrompts = {
-                    general: "Please provide a comprehensive and helpful answer to this question:",
-                    hindi: "Please answer this question in Hindi if it's about Hindi language, literature, or culture:",
-                    english: "Please provide a comprehensive answer focusing on English language, grammar, or literature:",
-                    math: "Please solve this mathematical problem step by step, showing all work and explanations:",
-                    physics: "Please explain this physics concept or solve this problem with detailed explanations and formulas:",
-                    chemistry: "Please explain this chemistry concept or solve this problem with detailed explanations and chemical equations:",
-                    biology: "Please explain this biological concept with detailed scientific explanations and diagrams if helpful:",
-                    history: "Please provide a comprehensive historical explanation with relevant dates and context:",
-                    commerce: "Please provide a detailed answer about commerce, business, or economics with relevant examples:"
-                };
-
-                const prompt = `${subjectPrompts[this.selectedSubject]} "${question}"
-
-Please format your response clearly with step-by-step explanations where applicable. Use markdown formatting for better readability.`;
-
-                const requestBody = {
-                    contents: [{
-                        parts: []
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 2048,
-                    }
-                };
-
-                if (this.currentMode === 'image' && this.uploadedImage) {
-                    // Add text prompt
-                    requestBody.contents[0].parts.push({
-                        text: prompt
-                    });
-
-                    // Add image data
-                    const base64Data = this.uploadedImage.data.split(',')[1];
-                    requestBody.contents[0].parts.push({
-                        inlineData: {
-                            mimeType: this.uploadedImage.mimeType,
-                            data: base64Data
-                        }
-                    });
-
-                    // Use Gemini Pro Vision model
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(requestBody)
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    return data.candidates[0].content.parts[0].text;
-                } else {
-                    // Text-only mode
-                    requestBody.contents[0].parts.push({
-                        text: prompt
-                    });
-
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(requestBody)
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    return data.candidates[0].content.parts[0].text;
-                }
-            }
-
-            setLoading(loading) {
-                const btn = document.getElementById('submitBtn');
-                const text = document.getElementById('submitText');
-                const icon = document.getElementById('submitIcon');
-
-                if (loading) {
-                    btn.disabled = true;
-                    text.textContent = 'Processing...';
-                    icon.innerHTML = '<div class="loading-spinner"></div>';
-                } else {
-                    btn.disabled = false;
-                    text.textContent = 'Get Answer';
-                    icon.innerHTML = 'send';
-                    icon.classList.add('material-icons-round');
-                }
-            }
-
-            showResult(content) {
-                const resultSection = document.getElementById('resultSection');
-                const resultContent = document.getElementById('resultContent');
-                
-                // Simple markdown formatting
-                let formattedContent = content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>') // italic
-                    .replace(/^# (.*$)/gm, '<h3>$1</h3>') // h1
-                    .replace(/^## (.*$)/gm, '<h4>$1</h4>') // h2
-                    .replace(/^### (.*$)/gm, '<h5>$1</h5>') // h3
-                    .replace(/`(.*?)`/g, '<code>$1</code>') // inline code
-                    .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>'); // code blocks
-                
-                resultContent.innerHTML = formattedContent;
-                resultSection.classList.add('show');
-                
-                // Scroll to result
-                setTimeout(() => {
-                    resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 100);
-            }
-
-            hideResult() {
-                document.getElementById('resultSection').classList.remove('show');
-            }
-
-            showError(message) {
-                const resultSection = document.getElementById('resultSection');
-                const resultContent = document.getElementById('resultContent');
-                
-                resultContent.innerHTML = `
-                    <div class="error-message">
-                        <span class="material-icons-round" style="font-size: 18px;">error</span>
-                        <span>${message}</span>
-                    </div>
-                `;
-                resultSection.classList.add('show');
-            }
-            
-            showToast(message, type = 'info') {
-                // Remove existing toast if any
-                const existingToast = document.querySelector('.toast');
-                if (existingToast) {
-                    existingToast.remove();
-                }
-                
-                const toast = document.createElement('div');
-                toast.className = `toast animate__animated animate__fadeInUp`;
-                
-                let icon = 'info';
-                let bgColor = 'var(--primary)';
-                
-                switch(type) {
-                    case 'success':
-                        icon = 'check_circle';
-                        bgColor = 'var(--success)';
-                        break;
-                    case 'error':
-                        icon = 'error';
-                        bgColor = 'var(--error)';
-                        break;
-                    case 'warning':
-                        icon = 'warning';
-                        bgColor = 'var(--warning)';
-                        break;
-                    default:
-                        icon = 'info';
-                        bgColor = 'var(--primary)';
-                }
-                
-                toast.innerHTML = `
-                    <span class="material-icons-round" style="font-size: 18px;">${icon}</span>
-                    <span>${message}</span>
-                `;
-                toast.style.background = bgColor;
-                
-                document.body.appendChild(toast);
-                
-                // Auto remove after 3 seconds
-                setTimeout(() => {
-                    toast.classList.add('animate__fadeOut');
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
+        if (textSection && imageSection) {
+            if (this.currentMode === 'text') {
+                textSection.style.display = 'block';
+                imageSection.style.display = 'none';
+            } else {
+                textSection.style.display = 'none';
+                imageSection.style.display = 'block';
             }
         }
 
-        // Initialize the app
-        const questionAI = new QuestionAI();
+        this.updateModeIndicator();
+        this.hideResult();
+    }
 
+    updateModeIndicator() {
+        const indicator = document.getElementById('modeIndicator');
+        if (!indicator) return;
+        
+        const icon = indicator.querySelector('.material-icons-round');
+        const text = indicator.querySelector('span:last-child');
+        
+        if (this.currentMode === 'text') {
+            icon.textContent = 'edit';
+            text.textContent = 'Text Mode';
+        } else {
+            icon.textContent = 'image';
+            text.textContent = 'Image Mode';
+        }
+    }
 
+    handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                this.showToast('Image size should be less than 5MB', 'error');
+                return;
+            }
+            this.processImage(file);
+        }
+    }
 
+    processImage(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.uploadedImage = {
+                data: e.target.result,
+                mimeType: file.type,
+                name: file.name
+            };
+            this.showImagePreview(e.target.result);
+            this.showToast('Image uploaded successfully', 'success');
+        };
+        reader.onerror = () => {
+            this.showToast('Error reading image file', 'error');
+        };
+        reader.readAsDataURL(file);
+    }
 
+    showImagePreview(imageSrc) {
+        const container = document.getElementById('imagePreviewContainer');
+        if (!container) return;
+        
+        container.innerHTML = `
+            <img src="${imageSrc}" class="image-preview" alt="Uploaded image">
+            <input type="text" class="image-question-input" id="imageQuestionInput" 
+                   placeholder="Ask about this image... (e.g., 'Solve this problem', 'What is this?', 'Explain this diagram')">
+            <div class="image-actions">
+                <button class="remove-image-btn" id="removeImageBtn">
+                    <span class="material-icons-round" style="font-size: 16px;">delete</span>
+                    Remove Image
+                </button>
+            </div>
+        `;
+        
+        // Add event listener to the new button
+        const removeBtn = document.getElementById('removeImageBtn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => this.removeImage());
+        }
+    }
 
+    removeImage() {
+        this.uploadedImage = null;
+        const container = document.getElementById('imagePreviewContainer');
+        if (container) container.innerHTML = '';
+        
+        const imageInput = document.getElementById('imageInput');
+        if (imageInput) imageInput.value = '';
+        
+        this.showToast('Image removed', 'info');
+    }
 
+    async handleSubmit() {
+        let question = '';
+        
+        if (this.currentMode === 'text') {
+            const questionInput = document.getElementById('questionInput');
+            question = questionInput ? questionInput.value.trim() : '';
+            if (!question) {
+                this.showError('Please enter your question!');
+                this.showToast('Please enter your question', 'error');
+                return;
+            }
+        } else {
+            if (!this.uploadedImage) {
+                this.showError('Please upload an image first!');
+                this.showToast('Please upload an image first', 'error');
+                return;
+            }
+            const imageQuestionInput = document.getElementById('imageQuestionInput');
+            question = imageQuestionInput ? imageQuestionInput.value.trim() : 'Analyze this image and answer any questions about it';
+        }
 
+        this.setLoading(true);
+        this.hideResult();
+        this.showToast('Processing your question...', 'info');
 
+        try {
+            const answer = await this.getAIAnswer(question);
+            this.showResult(answer);
+            this.showToast('Answer generated successfully!', 'success');
+        } catch (error) {
+            console.error('Error:', error);
+            const errorMsg = error.message.includes('quota') 
+                ? 'API quota exceeded. Please try again later.' 
+                : 'Sorry, there was an error processing your request. Please try again.';
+            this.showError(errorMsg);
+            this.showToast(errorMsg, 'error');
+        } finally {
+            this.setLoading(false);
+        }
+    }
 
+    async getAIAnswer(question) {
+        const subjectPrompts = {
+            general: "Please provide a comprehensive and helpful answer to this question:",
+            hindi: "Please answer this question in Hindi if it's about Hindi language, literature, or culture:",
+            english: "Please provide a comprehensive answer focusing on English language, grammar, or literature:",
+            math: "Please solve this mathematical problem step by step, showing all work and explanations:",
+            physics: "Please explain this physics concept or solve this problem with detailed explanations and formulas:",
+            chemistry: "Please explain this chemistry concept or solve this problem with detailed explanations and chemical equations:",
+            biology: "Please explain this biological concept with detailed scientific explanations and diagrams if helpful:",
+            history: "Please provide a comprehensive historical explanation with relevant dates and context:",
+            commerce: "Please provide a detailed answer about commerce, business, or economics with relevant examples:"
+        };
 
+        const prompt = `${subjectPrompts[this.selectedSubject]} "${question}"
 
-       // Replace the last part of your script with this:
+Please format your response clearly with step-by-step explanations where applicable. Use markdown formatting for better readability.`;
 
+        const requestBody = {
+            contents: [{
+                parts: []
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 2048,
+            }
+        };
+
+        if (this.currentMode === 'image' && this.uploadedImage) {
+            // Add text prompt
+            requestBody.contents[0].parts.push({
+                text: prompt
+            });
+
+            // Add image data
+            const base64Data = this.uploadedImage.data.split(',')[1];
+            requestBody.contents[0].parts.push({
+                inlineData: {
+                    mimeType: this.uploadedImage.mimeType,
+                    data: base64Data
+                }
+            });
+
+            // Use Gemini Pro Vision model
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        } else {
+            // Text-only mode
+            requestBody.contents[0].parts.push({
+                text: prompt
+            });
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+    }
+
+    setLoading(loading) {
+        const btn = document.getElementById('submitBtn');
+        const text = document.getElementById('submitText');
+        const icon = document.getElementById('submitIcon');
+
+        if (btn && text && icon) {
+            if (loading) {
+                btn.disabled = true;
+                text.textContent = 'Processing...';
+                icon.innerHTML = '<div class="loading-spinner"></div>';
+            } else {
+                btn.disabled = false;
+                text.textContent = 'Get Answer';
+                icon.innerHTML = 'send';
+                icon.classList.add('material-icons-round');
+            }
+        }
+    }
+
+    showResult(content) {
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
+        
+        if (!resultSection || !resultContent) return;
+        
+        // Simple markdown formatting
+        let formattedContent = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
+            .replace(/\*(.*?)\*/g, '<em>$1</em>') // italic
+            .replace(/^# (.*$)/gm, '<h3>$1</h3>') // h1
+            .replace(/^## (.*$)/gm, '<h4>$1</h4>') // h2
+            .replace(/^### (.*$)/gm, '<h5>$1</h5>') // h3
+            .replace(/`(.*?)`/g, '<code>$1</code>') // inline code
+            .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>'); // code blocks
+        
+        resultContent.innerHTML = formattedContent;
+        resultSection.classList.add('show');
+        
+        // Scroll to result
+        setTimeout(() => {
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+
+    hideResult() {
+        const resultSection = document.getElementById('resultSection');
+        if (resultSection) {
+            resultSection.classList.remove('show');
+        }
+    }
+
+    showError(message) {
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
+        
+        if (!resultSection || !resultContent) return;
+        
+        resultContent.innerHTML = `
+            <div class="error-message">
+                <span class="material-icons-round" style="font-size: 18px;">error</span>
+                <span>${message}</span>
+            </div>
+        `;
+        resultSection.classList.add('show');
+    }
+    
+    showToast(message, type = 'info') {
+        // Remove existing toast if any
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        const toast = document.createElement('div');
+        toast.className = `toast animate__animated animate__fadeInUp`;
+        
+        let icon = 'info';
+        let bgColor = 'var(--primary)';
+        
+        switch(type) {
+            case 'success':
+                icon = 'check_circle';
+                bgColor = 'var(--success)';
+                break;
+            case 'error':
+                icon = 'error';
+                bgColor = 'var(--error)';
+                break;
+            case 'warning':
+                icon = 'warning';
+                bgColor = 'var(--warning)';
+                break;
+            default:
+                icon = 'info';
+                bgColor = 'var(--primary)';
+        }
+        
+        toast.innerHTML = `
+            <span class="material-icons-round" style="font-size: 18px;">${icon}</span>
+            <span>${message}</span>
+        `;
+        toast.style.background = bgColor;
+        
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('animate__fadeOut');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+}
+
+// Initialize the app after DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Simulate loading (remove this in production)
+    // Page loader animation
     const simulateLoad = () => {
         const pageLoader = document.getElementById('pageLoader');
+        if (!pageLoader) return;
         
         // Hide loader after all assets are loaded (or minimum 2 seconds)
         const minLoadTime = 2000;
@@ -1249,10 +1275,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     simulateLoad();
     
-    // Initialize your app here, inside DOMContentLoaded
+    // Initialize the app
     const questionAI = new QuestionAI();
+    questionAI.init();
     
-    // Make it available globally if needed for onclick handlers
+    // Make it available globally if needed
     window.questionAI = questionAI;
 });
     </script>
