@@ -1167,273 +1167,29 @@ Please format your response clearly with step-by-step explanations where applica
            
            
    showResult(content) {
-    const resultSection = document.getElementById('resultSection');
-    const resultContent = document.getElementById('resultContent');
-    
-    if (!resultSection || !resultContent) return;
-    
-    // Process advanced tables with sorting capabilities
-    let formattedContent = this.processAdvancedTables(content);
-    
-    resultContent.innerHTML = formattedContent;
-    resultSection.classList.add('show');
-    
-    // Initialize interactive table features
-    this.initTableFeatures();
-    
-    // Scroll to result
-    setTimeout(() => {
-        resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
-}
-
-processAdvancedTables(content) {
-    // Convert markdown tables to advanced HTML tables
-    return content.replace(/(\|.*?\|\r?\n\|.*?\|\r?\n)((?:\|.*?\|\r?\n)*)/g, (match, header, rows) => {
-        const headers = header.split('|').slice(1, -1).map(h => h.trim());
-        const separator = header.replace(/[^|\r\n-]/g, ''); // Get separator line
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
         
-        return `
-        <div class="advanced-table-container">
-            <table class="advanced-table">
-                <thead>
-                    <tr>
-                        ${headers.map((h, i) => `
-                            <th data-sort="${i}">
-                                ${h}
-                                <span class="sort-icon" data-col="${i}">↕️</span>
-                            </th>
-                        `).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows.split('\n').filter(r => r.trim()).map(row => `
-                        <tr>
-                            ${row.split('|').slice(1, -1).map(cell => `
-                                <td>${cell.trim()}</td>
-                            `).join('')}
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-            <div class="table-controls">
-                <button class="export-btn" data-tableid="${Date.now()}">
-                    <span class="material-icons-round">download</span> Export
-                </button>
-                <div class="table-summary"></div>
-            </div>
-        </div>`;
-    });
-}
-
-initTableFeatures() {
-    // Add sorting functionality
-    document.querySelectorAll('.advanced-table th').forEach(header => {
-        header.addEventListener('click', () => {
-            const table = header.closest('table');
-            const colIndex = parseInt(header.dataset.sort);
-            const isAsc = !header.classList.contains('asc');
-            
-            this.sortTable(table, colIndex, isAsc);
-        });
-    });
-    
-    // Add export functionality
-    document.querySelectorAll('.export-btn').forEach(btn => {
-        btn.addEventListener('click', () => this.exportTable(btn.dataset.tableid));
-    });
-    
-    // Calculate table summaries
-    document.querySelectorAll('.advanced-table').forEach(table => {
-        this.calculateTableSummary(table);
-    });
-}
-
-
-           addTableStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .advanced-table-container {
-            margin: 16px 0;
-            overflow-x: auto;
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
+        if (!resultSection || !resultContent) return;
         
-        .advanced-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 0.9em;
-        }
+        // Simple markdown formatting
+        let formattedContent = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
+            .replace(/\*(.*?)\*/g, '<em>$1</em>') // italic
+            .replace(/^# (.*$)/gm, '<h3>$1</h3>') // h1
+            .replace(/^## (.*$)/gm, '<h4>$1</h4>') // h2
+            .replace(/^### (.*$)/gm, '<h5>$1</h5>') // h3
+            .replace(/`(.*?)`/g, '<code>$1</code>') // inline code
+            .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>'); // code blocks
         
-        .advanced-table th {
-            position: sticky;
-            top: 0;
-            background: var(--primary);
-            color: white;
-            padding: 12px 16px;
-            text-align: left;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s;
-        }
+        resultContent.innerHTML = formattedContent;
+        resultSection.classList.add('show');
         
-        .advanced-table th:hover {
-            background: var(--secondary);
-        }
-        
-        .advanced-table th.asc .sort-icon::after {
-            content: " ↑";
-        }
-        
-        .advanced-table th.desc .sort-icon::after {
-            content: " ↓";
-        }
-        
-        .advanced-table td {
-            padding: 10px 16px;
-            border-bottom: 1px solid #e2e8f0;
-            vertical-align: top;
-        }
-        
-        .advanced-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .advanced-table tr:nth-child(even) {
-            background-color: rgba(224, 231, 255, 0.2);
-        }
-        
-        .advanced-table tr:hover {
-            background-color: var(--primary-light);
-        }
-        
-        .table-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .export-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 0.8em;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .export-btn:hover {
-            background: var(--secondary);
-            transform: translateY(-1px);
-        }
-        
-        .table-summary {
-            font-size: 0.8em;
-            color: var(--text-secondary);
-        }
-        
-        @media (max-width: 480px) {
-            .advanced-table th, 
-            .advanced-table td {
-                padding: 8px 12px;
-                font-size: 0.85em;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
-sortTable(table, columnIndex, ascending) {
-    const tbody = table.querySelector('tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    
-    rows.sort((a, b) => {
-        const aVal = a.querySelectorAll('td')[columnIndex].textContent.trim();
-        const bVal = b.querySelectorAll('td')[columnIndex].textContent.trim();
-        
-        // Numeric sorting
-        if (!isNaN(aVal) {
-            return ascending ? aVal - bVal : bVal - aVal;
-        }
-        // Date sorting
-        else if (Date.parse(aVal)) {
-            return ascending ? Date.parse(aVal) - Date.parse(bVal) : Date.parse(bVal) - Date.parse(aVal);
-        }
-        // String sorting
-        else {
-            return ascending ? 
-                aVal.localeCompare(bVal) : 
-                bVal.localeCompare(aVal);
-        }
-    });
-    
-    // Clear existing rows
-    while (tbody.firstChild) {
-        tbody.removeChild(tbody.firstChild);
+        // Scroll to result
+        setTimeout(() => {
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
     }
-    
-    // Add sorted rows
-    rows.forEach(row => tbody.appendChild(row));
-    
-    // Update sort indicators
-    table.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
-    const header = table.querySelectorAll('th')[columnIndex];
-    header.classList.add(ascending ? 'asc' : 'desc');
-}
-
-exportTable(tableId) {
-    const table = document.querySelector(`[data-tableid="${tableId}"]`).closest('.advanced-table-container').querySelector('table');
-    const html = table.outerHTML;
-    const blob = new Blob([html], {type: 'text/html'});
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `table-export-${new Date().toISOString().slice(0,10)}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-calculateTableSummary(table) {
-    const summaryEl = table.closest('.advanced-table-container').querySelector('.table-summary');
-    const rowCount = table.querySelectorAll('tbody tr').length;
-    const colCount = table.querySelectorAll('thead th').length;
-    
-    // Find numeric columns and calculate totals
-    const numericColumns = [];
-    table.querySelectorAll('tbody tr:first-child td').forEach((td, i) => {
-        if (!isNaN(td.textContent.trim())) {
-            let total = 0;
-            table.querySelectorAll(`tbody tr td:nth-child(${i+1})`).forEach(cell => {
-                total += parseFloat(cell.textContent.trim()) || 0;
-            });
-            numericColumns.push({
-                index: i,
-                header: table.querySelector(`thead th:nth-child(${i+1})`).textContent.trim(),
-                total: total.toFixed(2)
-            });
-        }
-    });
-    
-    let summaryText = `${rowCount} rows`;
-    if (numericColumns.length > 0) {
-        summaryText += ` | ${numericColumns.map(col => `${col.header}: ${col.total}`).join(', ')}`;
-    }
-    
-    summaryEl.textContent = summaryText;
-}
-
-
 
 
 
