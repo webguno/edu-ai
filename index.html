@@ -1221,7 +1221,8 @@ Please format your response clearly with step-by-step explanations where applica
 
 
 
-        // Add this right before the QuestionAI initialization
+       // Replace the last part of your script with this:
+
 document.addEventListener('DOMContentLoaded', () => {
     // Simulate loading (remove this in production)
     const simulateLoad = () => {
@@ -1247,10 +1248,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     simulateLoad();
+    
+    // Initialize your app here, inside DOMContentLoaded
+    const questionAI = new QuestionAI();
+    
+    // Make it available globally if needed for onclick handlers
+    window.questionAI = questionAI;
 });
-
-// Then initialize your app as normal
-const questionAI = new QuestionAI();
     </script>
 </body>
 </html>
