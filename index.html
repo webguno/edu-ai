@@ -1352,7 +1352,86 @@ initTableFeatures() {
     `;
     document.head.appendChild(style);
 }
+sortTable(table, columnIndex, ascending) {
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    rows.sort((a, b) => {
+        const aVal = a.querySelectorAll('td')[columnIndex].textContent.trim();
+        const bVal = b.querySelectorAll('td')[columnIndex].textContent.trim();
+        
+        // Numeric sorting
+        if (!isNaN(aVal) {
+            return ascending ? aVal - bVal : bVal - aVal;
+        }
+        // Date sorting
+        else if (Date.parse(aVal)) {
+            return ascending ? Date.parse(aVal) - Date.parse(bVal) : Date.parse(bVal) - Date.parse(aVal);
+        }
+        // String sorting
+        else {
+            return ascending ? 
+                aVal.localeCompare(bVal) : 
+                bVal.localeCompare(aVal);
+        }
+    });
+    
+    // Clear existing rows
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    // Add sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+    
+    // Update sort indicators
+    table.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
+    const header = table.querySelectorAll('th')[columnIndex];
+    header.classList.add(ascending ? 'asc' : 'desc');
+}
 
+exportTable(tableId) {
+    const table = document.querySelector(`[data-tableid="${tableId}"]`).closest('.advanced-table-container').querySelector('table');
+    const html = table.outerHTML;
+    const blob = new Blob([html], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `table-export-${new Date().toISOString().slice(0,10)}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+calculateTableSummary(table) {
+    const summaryEl = table.closest('.advanced-table-container').querySelector('.table-summary');
+    const rowCount = table.querySelectorAll('tbody tr').length;
+    const colCount = table.querySelectorAll('thead th').length;
+    
+    // Find numeric columns and calculate totals
+    const numericColumns = [];
+    table.querySelectorAll('tbody tr:first-child td').forEach((td, i) => {
+        if (!isNaN(td.textContent.trim())) {
+            let total = 0;
+            table.querySelectorAll(`tbody tr td:nth-child(${i+1})`).forEach(cell => {
+                total += parseFloat(cell.textContent.trim()) || 0;
+            });
+            numericColumns.push({
+                index: i,
+                header: table.querySelector(`thead th:nth-child(${i+1})`).textContent.trim(),
+                total: total.toFixed(2)
+            });
+        }
+    });
+    
+    let summaryText = `${rowCount} rows`;
+    if (numericColumns.length > 0) {
+        summaryText += ` | ${numericColumns.map(col => `${col.header}: ${col.total}`).join(', ')}`;
+    }
+    
+    summaryEl.textContent = summaryText;
+}
 
 
 
