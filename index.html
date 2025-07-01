@@ -1160,29 +1160,70 @@ Please format your response clearly with step-by-step explanations where applica
     }
 
     showResult(content) {
-        const resultSection = document.getElementById('resultSection');
-        const resultContent = document.getElementById('resultContent');
+    const resultSection = document.getElementById('resultSection');
+    const resultContent = document.getElementById('resultContent');
+    
+    if (!resultSection || !resultContent) return;
+    
+    // Enhanced markdown formatting with table support
+    let formattedContent = content
+        // Tables (converts markdown tables to HTML)
+        .replace(/\|(.+?)\|/g, (match) => {
+            // Skip if it's a table header separator
+            if (match.includes('---')) return match;
+            return match.replace(/\|/g, '</td><td>').replace(/^<\/td>/, '<tr><td>').replace(/<\/td>$/, '</td></tr>');
+        })
+        .replace(/(<tr><td>.+?<\/td><\/tr>)/gs, '<table class="result-table">$1</table>')
+        .replace(/<td>\s*---+\s*<\/td>/g, '') // Remove header separators
         
-        if (!resultSection || !resultContent) return;
-        
-        // Simple markdown formatting
-        let formattedContent = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
-            .replace(/\*(.*?)\*/g, '<em>$1</em>') // italic
-            .replace(/^# (.*$)/gm, '<h3>$1</h3>') // h1
-            .replace(/^## (.*$)/gm, '<h4>$1</h4>') // h2
-            .replace(/^### (.*$)/gm, '<h5>$1</h5>') // h3
-            .replace(/`(.*?)`/g, '<code>$1</code>') // inline code
-            .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>'); // code blocks
-        
-        resultContent.innerHTML = formattedContent;
-        resultSection.classList.add('show');
-        
-        // Scroll to result
-        setTimeout(() => {
-            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-    }
+        // Other markdown formatting
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/^# (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gm, '<h4>$1</h4>')
+        .replace(/^### (.*$)/gm, '<h5>$1</h5>')
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
+
+    resultContent.innerHTML = formattedContent;
+    resultSection.classList.add('show');
+    
+    // Add this CSS dynamically
+    this.addTableStyles();
+    
+    // Scroll to result
+    setTimeout(() => {
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+addTableStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.9em;
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        .result-table td {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .result-table tr:nth-child(even) {
+            background-color: var(--primary-light);
+        }
+        .result-table tr:first-child {
+            font-weight: 600;
+            background-color: var(--primary);
+            color: white;
+        }
+    `;
+    document.head.appendChild(style);
+}
 
     hideResult() {
         const resultSection = document.getElementById('resultSection');
