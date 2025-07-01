@@ -684,6 +684,50 @@
     50% { opacity: 1; }
 }
 
+
+
+
+
+
+
+/* Add this to your existing CSS */
+.result-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.result-content th {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.result-content td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+
+.result-content tr:last-child td {
+    border-bottom: none;
+}
+
+.result-content tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.result-content tr:hover {
+    background-color: #f1f5f9;
+}
+
         
     </style>
 </head>
@@ -1166,31 +1210,48 @@ Please format your response clearly with step-by-step explanations where applica
            
            
            
-   showResult(content) {
-        const resultSection = document.getElementById('resultSection');
-        const resultContent = document.getElementById('resultContent');
-        
-        if (!resultSection || !resultContent) return;
-        
-        // Simple markdown formatting
-        let formattedContent = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
-            .replace(/\*(.*?)\*/g, '<em>$1</em>') // italic
-            .replace(/^# (.*$)/gm, '<h3>$1</h3>') // h1
-            .replace(/^## (.*$)/gm, '<h4>$1</h4>') // h2
-            .replace(/^### (.*$)/gm, '<h5>$1</h5>') // h3
-            .replace(/`(.*?)`/g, '<code>$1</code>') // inline code
-            .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>'); // code blocks
-        
-        resultContent.innerHTML = formattedContent;
-        resultSection.classList.add('show');
-        
-        // Scroll to result
-        setTimeout(() => {
-            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-    }
-
+ showResult(content) {
+    const resultSection = document.getElementById('resultSection');
+    const resultContent = document.getElementById('resultContent');
+    
+    if (!resultSection || !resultContent) return;
+    
+    // Enhanced markdown formatting with table support
+    let formattedContent = content
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Headers
+        .replace(/^# (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gm, '<h4>$1</h4>')
+        .replace(/^### (.*$)/gm, '<h5>$1</h5>')
+        // Inline code
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        // Code blocks
+        .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>')
+        // Tables - basic support for markdown tables
+        .replace(/(\|.*?\|\n\|.*?\|\n)((?:\|.*?\|\n)+)/g, function(match, headerRow, bodyRows) {
+            // Process header row
+            const headers = headerRow.split('|').slice(1, -1).map(h => `<th>${h.trim()}</th>`).join('');
+            
+            // Process body rows
+            const rows = bodyRows.trim().split('\n').map(row => {
+                const cells = row.split('|').slice(1, -1).map(c => `<td>${c.trim()}</td>`).join('');
+                return `<tr>${cells}</tr>`;
+            }).join('');
+            
+            return `<table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
+        });
+    
+    resultContent.innerHTML = formattedContent;
+    resultSection.classList.add('show');
+    
+    // Scroll to result
+    setTimeout(() => {
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
 
 
 
